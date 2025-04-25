@@ -1,0 +1,21 @@
+ajax_cart_update.settings:
+  path: '/admin/config/ajax-cart-update/settings'
+  defaults:
+    _form: '\Drupal\ajax_cart_update\Form\AjaxCartUpdateSettingsForm'
+    _title: 'AJAX Cart Update Settings'
+  requirements:
+    _permission: 'administer site configuration'
+
+ajax_cart_update.cart_summary_html:
+  path: '/ajax/cart/summary-html'
+  defaults:
+    _controller: '\Drupal\ajax_cart_update\Controller\AjaxCartUpdateController::getCartSummaryHtml'
+  requirements:
+    _permission: 'access content'
+
+ajax_cart_update.cart_update:
+  path: '/ajax/cart/update'
+  defaults:
+    _controller: '\Drupal\ajax_cart_update\Controller\AjaxCartUpdateController::updateCart'
+  requirements:
+    _permission: 'access content'

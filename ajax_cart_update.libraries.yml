@@ -1,0 +1,22 @@
+ajax_cart_selectors:
+  version: 1.x
+  js:
+    js/ajax-cart-selectors.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupal.ajax
+    - core/drupalSettings
+    - core/once
+    - core/jquery.form
+ajax_cart_endpoint:
+  version: 1.x
+  js:
+    js/ajax-cart-endpoint.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupal.ajax
+    - core/drupalSettings
+    - core/once
+    - core/jquery.form

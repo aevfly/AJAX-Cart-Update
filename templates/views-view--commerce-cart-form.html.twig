@@ -1,0 +1,76 @@
+{#
+/**
+ * @file
+ * Theme override for the commerce cart form view.
+ *
+ * Available variables:
+ * - attributes: Table attributes to apply to the drag table.
+ * - caption: The caption for this table.
+ * - colgroups: Column groups. Each group contains the following properties:
+ *   - attributes: HTML attributes to apply to the column group.
+ * - header: Table header cells. Each cell contains the following properties:
+ *   - tag: The HTML tag.
+ *   - attributes: HTML attributes to apply to the tag.
+ *   - content: A localized string for the title of the column.
+ *   - field: Field name (required for column sorting).
+ *   - sort: Default sort order for this column ("asc" or "desc").
+ * - sticky: A flag indicating whether to use a sticky table header.
+ * - rows: Table rows. Each row contains the following properties:
+ *   - attributes: HTML attributes to apply to the TR tag.
+ *   - columns: Table columns. Each column contains the following properties:
+ *     - attributes: HTML attributes to apply to the TD tag.
+ *     - content: The column content.
+ *     - field: Field name (required for column sorting).
+ *     - order_item_id: The ID of the order item for this row (Commerce specific).
+ * - footer: Table footer rows.
+ * - empty: The message to display in an extra row if table does not have
+ *   any rows.
+ * - no_striping: A flag indicating that the row should receive no
+ *   'even/odd' styling.
+ * - table_attributes: Human-readable attributes for the table tag.
+ */
+#}
+{{ view.header }}
+
+{% if rows %}
+  <form{{ attributes.addClass('views-form-commerce-cart-form') }}>
+    {{ form.form_build_id }}
+    {{ form.form_token }}
+    {{ form.form_id }}
+
+    <table{{ table_attributes.addClass('views-table', 'views-view-table') }}>
+      <thead>
+        {{ header }}
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          {% set order_item_id = row.order_item_id is defined ? row.order_item_id : 0 %}
+          <tr{{ row.attributes }}>
+            {% for column in row.columns %}
+              {% if column.field == 'total_price__number' %}
+                <td class="views-field views-field-total-price__number" 
+                    headers="view-total-price-number-table-column" 
+                    data-order-item-id="{{ order_item_id }}">
+                  {{ column.content }}
+                </td>
+              {% else %}
+                <td{{ column.attributes }}>
+                  {{ column.content }}
+                </td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {{ footer }}
+    {{ form.actions }}
+  </form>
+{% else %}
+  <p>{{ empty }}</p>
+{% endif %}
+
+{{ exposed }}
+{{ attachment_before }}
+{{ attachment_after }}

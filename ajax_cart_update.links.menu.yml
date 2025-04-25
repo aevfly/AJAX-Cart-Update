@@ -1,0 +1,6 @@
+ajax_cart_update.settings:
+  title: 'AJAX Cart Update Settings'
+  description: 'Configure settings for AJAX Cart Update module.'
+  parent: commerce.configuration
+  route_name: ajax_cart_update.settings
+  weight: 0
