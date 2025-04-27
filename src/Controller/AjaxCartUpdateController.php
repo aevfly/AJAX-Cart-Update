@@ -300,4 +300,60 @@ class AjaxCartUpdateController extends ControllerBase {
     return new JsonResponse($response, 200, ['Content-Type' => 'application/json']);
   }
 
+  /**
+   * Returns cart prices and related data as JSON.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The JSON response containing prices and related data.
+   */
+  public function getCartPricesHtml(): JsonResponse {
+    $carts = $this->cartProvider->getCarts();
+    $response = [
+      'item_prices' => [],
+      'total_price_number' => [],
+      'cart_block_price' => [],
+      'cart_block_summary_count' => '',
+      'cart_block_quantity' => [],
+      'cart_block_title' => [],
+    ];
+
+    foreach ($carts as $cart) {
+      if ($cart instanceof OrderInterface && $cart->hasItems()) {
+        $total_quantity = 0;
+        foreach ($cart->getItems() as $order_item) {
+          $total_quantity += $order_item->getQuantity();
+          $total_price = $order_item->getTotalPrice();
+
+          // Price for item_prices, total_price_number, and cart_block_price.
+          if ($total_price) {
+            $price_render = [
+              '#type' => 'inline_template',
+              '#template' => '{{ price|commerce_price_format }}',
+              '#context' => ['price' => $total_price],
+            ];
+            $rendered_price = $this->renderer->renderPlain($price_render);
+            $response['item_prices'][] = $rendered_price;
+            $response['total_price_number'][] = $rendered_price;
+            $response['cart_block_price'][] = $rendered_price;
+          }
+          else {
+            $response['item_prices'][] = '';
+            $response['total_price_number'][] = '';
+            $response['cart_block_price'][] = '';
+          }
+
+          // Add item quantities and titles for cart block.
+          $response['cart_block_quantity'][] = $order_item->getQuantity() . ' ' . t('x');
+          $response['cart_block_title'][] = $order_item->getTitle();
+        }
+
+        // Set total quantity for cart block summary.
+        $item_text = t('items', [], ['context' => 'Cart block item count']);
+        $response['cart_block_summary_count'] = $total_quantity . ' ' . $item_text;
+      }
+    }
+
+    return new JsonResponse($response, 200, ['Content-Type' => 'application/json']);
+  }
+
 }

@@ -87,27 +87,52 @@ function ajax_cart_update_preprocess_views_view(array &$variables): void {
   $config = \Drupal::config('ajax_cart_update.settings');
   $update_method = $config->get('update_method') ?: 'selectors';
  
-  
-$selectors = [
-  'total_price_number' => '.cart-form .views-field-total-price__number .field-content',
-  'order_total_summary' => '[data-drupal-selector="order-total-summary"]',
-  'order_total' => '.order-total-line__total .order-total-line-value',
-  'order_subtotal' => '.order-total-line__subtotal .order-total-line-value',
-  'cart_block_summary_count' => '.cart-block--summary__count',
-  'cart_block_quantity' => '.cart--cart-block .views-field-quantity',
-  'cart_block_price' => '.cart--cart-block .views-field-total-price__number .field-content',
-  'cart_block_title' => '.cart--cart-block .views-field-title',
-];
+  // Define default selectors for the cart form.
+  $selectors = [
+    'total_price_number' => '.cart-form .views-field-total-price__number .field-content',
+    'order_total_summary' => '[data-drupal-selector="order-total-summary"]',
+    'order_total' => '.order-total-line__total .order-total-line-value',
+    'order_subtotal' => '.order-total-line__subtotal .order-total-line-value',
+    'cart_block_summary_count' => '.cart-block--summary__count',
+    'cart_block_quantity' => '.cart--cart-block .views-field-quantity',
+    'cart_block_price' => '.cart--cart-block .views-field-total-price__number .field-content',
+    'cart_block_title' => '.cart--cart-block .views-field-title',
+  ];
+
+  // Define custom endpoints for endpoint method
+  $customEndpoints = [
+    'summary' => [
+      'url' => '/ajax/cart/summary-html',
+      'selectors' => $selectors,
+    ],
+    'prices' => [
+      'url' => '/ajax/cart/prices',
+      'selectors' => [
+        'total_price_number' => $selectors['total_price_number'],
+        'cart_block_price' => $selectors['cart_block_price'],
+        'cart_block_summary_count' => $selectors['cart_block_summary_count'],
+        'cart_block_quantity' => $selectors['cart_block_quantity'],
+        'cart_block_title' => $selectors['cart_block_title'],
+      ],
+    ],
+  ];
 
   // Only process selectors if the update method is 'selectors'.
   if ($view->id() === 'commerce_cart_form') {
 
-    // Динамічні селектори залежно від стилю.
     switch ($style_plugin) {
       case 'table':
-        // Для таблиці використовуємо <td> з класами Views.
+        // For table use Views default.
         $selectors['total_price_number'] = '.cart-form td.views-field-total-price__number';
         $selectors['cart_block_price'] = '.cart--cart-block .views-field-total-price__number';
+        $customEndpoints['summary']['selectors'] = $selectors;
+        $customEndpoints['prices']['selectors'] = [
+          'total_price_number' => $selectors['total_price_number'],
+          'cart_block_price' => $selectors['cart_block_price'],
+          'cart_block_summary_count' => $selectors['cart_block_summary_count'],
+          'cart_block_quantity' => $selectors['cart_block_quantity'],
+          'cart_block_title' => $selectors['cart_block_title'],
+        ];
         break;
 
       case 'grid':
@@ -124,6 +149,7 @@ $selectors = [
     $variables['#attached']['drupalSettings']['ajaxCartUpdate'] = [
       'selectors' => $selectors,
       'updateMethod' => $update_method,
+      'customEndpoints' => $update_method === 'endpoint' ? $customEndpoints : [],
     ];
   } elseif ($view->id() === 'commerce_cart_form') {
     // Pass update method even if selectors are not used.

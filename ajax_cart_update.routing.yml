@@ -19,3 +19,10 @@ ajax_cart_update.cart_update:
     _controller: '\Drupal\ajax_cart_update\Controller\AjaxCartUpdateController::updateCart'
   requirements:
     _permission: 'access content'
+
+ajax_cart_update.prices:
+  path: '/ajax/cart/prices'
+  defaults:
+    _controller: '\Drupal\ajax_cart_update\Controller\AjaxCartUpdateController::getCartPricesHtml'
+  requirements:
+    _permission: 'access content'

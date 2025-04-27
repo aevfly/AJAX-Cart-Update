@@ -5,7 +5,7 @@ The **AJAX Cart Update** module enhances the Drupal Commerce cart form by provid
 
 The module supports two update methods:
 - **Selectors**: Updates cart elements using predefined CSS selectors extracted from the Views render array.
-- **Endpoint**: Uses an AJAX endpoint to fetch and update cart summary HTML.
+- **Endpoint**: Uses configurable AJAX endpoints to fetch and update cart data, offering greater flexibility for complex layouts and integration with client-side frameworks like Vue.js or React.
 
 This module is ideal for Drupal Commerce sites that need a responsive and modern cart experience.
 
@@ -31,7 +31,7 @@ This module is ideal for Drupal Commerce sites that need a responsive and modern
 1. Navigate to the module's settings page at `/admin/config/ajax-cart-update/settings`.
 2. Choose the **Cart update method**:
    - **Use selectors from Views**: Updates cart totals and prices using CSS selectors. Suitable for most setups.
-   - **Use AJAX endpoint for HTML**: Fetches updated HTML via an AJAX endpoint for more complex cart layouts.
+   - **Use AJAX endpoint for HTML**: Fetches updated data via configurable AJAX endpoints for more complex cart layouts or client-side framework integration.
 3. Save the configuration.
 
 ## Usage
@@ -41,6 +41,26 @@ This module is ideal for Drupal Commerce sites that need a responsive and modern
   - Item prices in the cart table.
   - Cart block summary (e.g., item count and quantities in the cart block).
 - The module supports multilingual sites by handling language prefixes in AJAX URLs (e.g., `/en/cart`, `/uk/cart`).
+
+### Custom Endpoints (Endpoint Mode)
+The **Endpoint** mode supports multiple configurable AJAX endpoints for updating specific parts of the cart, such as prices, order summaries, or cart block content. These endpoints are defined in `drupalSettings.ajaxCartUpdate.customEndpoints`. Each endpoint includes:
+- A unique URL (e.g., `/ajax/cart/summary-html`, `/ajax/cart/prices`).
+- A set of CSS selectors for updating specific DOM elements.
+
+If no custom endpoints are defined, the module defaults to `/ajax/cart/summary-html`.
+
+The module triggers the `ajaxCartUpdate:endpointUpdated` event after each endpoint update, passing the endpoint name and response data. This allows client-side frameworks like Vue.js or React to update their component state. Example usage:
+
+```javascript
+$(document).on('ajaxCartUpdate:endpointUpdated', (event, { endpoint, data }) => {
+  if (endpoint === 'summary') {
+    // Update Vue.js/React state with cart summary data
+    console.log('Cart summary updated:', data);
+  } else if (endpoint === 'prices') {
+    // Update prices in the component
+    console.log('Cart prices updated:', data);
+  }
+});
 
 ## Permissions
 - **Administer site configuration**: Required to access the module's settings page (`/admin/config/ajax-cart-update/settings`).
@@ -55,26 +75,43 @@ The module provides several hooks for customization:
 - `hook_preprocess_views_view()`: Passes selectors to JavaScript for the cart form.
 
 ### AJAX Endpoints
-- `/ajax/cart/update`: Updates the cart quantities and returns AJAX commands.
-- `/ajax/cart/summary-html`: Returns cart summary HTML as JSON (used in endpoint mode).
+- `/ajax/cart/update`: Updates cart quantities and returns AJAX commands.
+- `/ajax/cart/summary-html`: Returns cart summary HTML as JSON (used in both modes).
+- `/ajax/cart/prices`: Returns prices and related data as JSON (used in endpoint mode).
 
 ### JavaScript
 The module includes two JavaScript files:
-- `js/ajax-cart-selectors.js`: Handles updates using CSS selectors.
-- `js/ajax-cart-endpoint.js`: Handles updates via the AJAX endpoint.
+- `js/ajax-cart-selectors.js`: Handles updates using CSS selectors. Suitable for simple setups.
+- `js/ajax-cart-endpoint.js`: Handles updates via configurable AJAX endpoints, with support for client-side validation and integration with frameworks like Vue.js or React.
 
 ### Extending the Module
 Developers can customize the module by:
-- Modifying selectors in `ajax_cart_update_preprocess_views_view()` to target different elements.
+- Modifying selectors or custom endpoints in `ajax_cart_update_preprocess_views_view()` to target different elements or add new endpoints.
 - Overriding the `views-view--commerce-cart-form.html.twig` template for custom cart form layouts.
 - Adding custom AJAX commands in `AjaxCartUpdateController.php`.
+- Listening to the `commerce_cart_updated` or `ajaxCartUpdate:endpointUpdated` events to integrate with client-side frameworks or perform additional updates.
+
+Example of adding a custom endpoint:
+```php
+function mymodule_preprocess_views_view(&$variables) {
+  if ($variables['view']->id() === 'commerce_cart_form') {
+    $variables['#attached']['drupalSettings']['ajaxCartUpdate']['customEndpoints']['custom'] = [
+      'url' => '/ajax/cart/custom-data',
+      'selectors' => [
+        'custom_field' => '.custom-cart-field',
+      ],
+    ];
+  }
+}
+```
 
 ## Troubleshooting
 - If AJAX updates do not work, ensure that:
   - The Commerce cart form is rendered using the Views module.
   - JavaScript libraries (`core/jquery`, `core/drupal.ajax`, etc.) are properly loaded.
   - The correct update method is selected in the module settings.
-- Check the browser console for JavaScript errors and the Drupal logs for PHP errors.
+  - Quantity inputs contain valid numeric values (non-negative).
+- Check the browser console for JavaScript errors (e.g., invalid selectors or endpoint failures) and the Drupal logs for PHP errors.
 - Verify that the cart block and cart form selectors match the theme's markup.
 
 ## Support

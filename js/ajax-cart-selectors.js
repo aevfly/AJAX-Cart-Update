@@ -15,6 +15,12 @@
       clearTimeout(timeout);
 
       const $self = $(this);
+      const quantity = $self.val();
+
+      // Check if the quantity is a valid number and greater than or equal to 0.
+      if (!$.isNumeric(quantity) || quantity < 0) {
+        return;
+      }
 
       timeout = setTimeout(() => {
 
@@ -29,7 +35,7 @@
             $formElement.find('.ajax-progress').remove();
           },
           success: function (response) {
-            // Wait a bit and then fetch the cart summary
+            // Wait a bit and then fetch the cart summary.
             setTimeout(() => {
               $.ajax({
                 url: langPrefix + '/ajax/cart/summary-html',
@@ -84,7 +90,7 @@
                     });
                   }
 
-                  // Trigger an event that other modules can listen for
+                  // Trigger an event that other modules can listen for.
                   $(document).trigger('commerce_cart_updated');
                 }
               });
