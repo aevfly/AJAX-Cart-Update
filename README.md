@@ -1,5 +1,13 @@
 # AJAX Cart Update
 
+[![Drupal 10 ready](https://img.shields.io/badge/Drupal%2010-ready-28a745.svg)](https://www.drupal.org/project/ajax_cart_update)
+[![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](LICENSE.txt)
+[![GitHub issues](https://img.shields.io/github/issues/aevfly/AJAX-Cart-Update.svg)](https://github.com/aevfly/AJAX-Cart-Update/issues)
+[![Last commit](https://img.shields.io/github/last-commit/aevfly/AJAX-Cart-Update.svg)](https://github.com/aevfly/AJAX-Cart-Update/commits/main)
+[![GitHub stars](https://img.shields.io/github/stars/aevfly/AJAX-Cart-Update?style=social)](https://github.com/aevfly/AJAX-Cart-Update)
+
+---
+
 ## Overview
 The **AJAX Cart Update** module enhances the Drupal Commerce cart form by providing AJAX-based functionality to dynamically update item quantities and order totals without requiring a full page reload. This improves the user experience by making cart interactions faster and more seamless.
 
